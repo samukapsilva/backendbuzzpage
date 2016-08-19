@@ -1,0 +1,80 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+	 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		 
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:spring-configured />
+	<context:component-scan base-package="${package}">
+		<context:exclude-filter type="regex"
+			expression=".*Service" />
+	</context:component-scan>
+	<tx:annotation-driven />
+	<bean id="errors"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:errors.properties" />
+	</bean>
+	<bean id="analytics"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:analytics.properties" />
+	</bean>
+	<bean id="buzzPageException" class="${package}.exception.BuzzPageException">
+		<property name="errors" ref="errors" />
+	</bean>
+
+	<bean id="entityManagerFactoryBean"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="persistenceUnitName" value="buzzpageRestPersistence" />
+		<property name="packagesToScan" value="${package}.entity" />
+
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.archive.autodetection">class</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:buzzpage" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryBean" />
+	</bean>
+
+	<bean id="googleAnalyticsReport" class="${package}.util.GoogleAnalyticsReport">
+		<property name="analytics" ref="analytics"/>
+	</bean>
+
+	<bean id="anuncianteDao" class="${package}.dao.impl.AnuncianteDaoJPA2Impl" />
+	<bean id="anuncioDao" class="${package}.dao.impl.AnuncioDaoJPA2Impl" />
+	<bean id="conteudoColaboradorDao" class="${package}.dao.impl.ConteudoColaboradorDaoJPA2Impl" />
+	<bean id="extratoFinanceiroDao" class="${package}.dao.impl.ExtratoFinanceiroDaoJPA2Impl" />
+	<bean id="paginaDao" class="${package}.dao.impl.PaginaDaoJPA2Impl" />
+	<bean id="pessoaDao" class="${package}.dao.impl.PessoaDaoJPA2Impl" />
+	<bean id="metricaTextoDao" class="${package}.dao.impl.MetricaTextoDaoJPA2Impl" />
+	<bean id="regiaoDao" class="${package}.dao.impl.RegiaoDaoJPA2Impl" />
+	<bean id="tipoLancamentoDao" class="${package}.dao.impl.TipoLancamentoDaoJPA2Impl" />
+</beans>

@@ -1,0 +1,45 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+	<New id="restDemoDS" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>java:/restDemoDB</Arg>
+		<Arg>
+			<New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+				<Set name="Url">jdbc:mysql://localhost:3307/buzzpage?allowMultiQueries=true
+				</Set>
+				<Set name="User">root</Set>
+				<Set name="Password">alex010203</Set>
+			</New>
+		</Arg>
+	</New>
+
+	<New id="demoLegacyDS" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>java:/restDemoLegacyDB</Arg>
+		<Arg>
+			<New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+				<Set name="Url">jdbc:mysql://localhost:3306/buzzpage?allowMultiQueries=true
+				</Set>
+				<Set name="User">root</Set>
+				<Set name="Password"></Set>
+			</New>
+		</Arg>
+	</New>
+
+	<New id="restBuzzPageDS" class="org.eclipse.jetty.plus.jndi.Resource">
+		<Arg></Arg>
+		<Arg>java:/restBuzzPageDB</Arg>
+		<Arg>
+			<New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+				<Set name="Url">jdbc:mysql://localhost:3307/buzzpage?allowMultiQueries=true
+				</Set>
+				<Set name="User">root</Set>
+				<Set name="Password">alex010203</Set>
+			</New>
+		</Arg>
+	</New>
+
+</Configure>

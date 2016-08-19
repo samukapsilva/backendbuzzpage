@@ -1,0 +1,148 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+	 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		
+		http://www.springframework.org/schema/task 
+		http://www.springframework.org/schema/task/spring-task.xsd
+		 
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Autowired -->
+	<!-- used to activate annotations in beans already registered in the application 
+		context (no matter if they were defined with XML or by package scanning) -->
+	<context:annotation-config />
+	<!-- scans packages to find and register beans within the application context. -->
+	<context:component-scan base-package="br.com.buzzpage" />
+	<bean id="errors" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    	<property name="location" value="classpath:errors.properties"/>
+	</bean>
+	<bean id="analytics" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    	<property name="location" value="classpath:analytics.properties"/>
+	</bean>
+	<!-- ************ JPA configuration *********** -->
+
+	<!-- classpath*:*.properties -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<bean id="entityManagerFactoryBuzzPage"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:config/persistence-config.xml" />
+		<property name="persistenceUnitName" value="buzzpageRestPersistence" />
+		<property name="dataSource" ref="restBuzzPageDS" />
+		<property name="packagesToScan">
+			<array>
+				<value>br.com.buzzpage.entity</value>
+			</array>
+		</property>
+
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="net.sf.ehcache.configurationResourceName">/ehcache.xml</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
+			</props>
+		</property>
+
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryBuzzPage" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<task:annotation-driven />
+	<!--spring cache -->
+	<!-- Ehcache library setup -->
+	<bean id="ehcache" name="ehcache"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
+		p:shared="true" p:configLocation="classpath:ehcache.xml" />
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
+		p:cacheManager-ref="ehcache" />
+
+	<!-- @PersistenceUnit annotation -->
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	<bean id="persistenceExceptionTranslationPostProcessor"
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+	<bean id="podcastRestService" class="br.com.buzzpage.rest.service.PodcastRestService" />
+	<bean id="podcastLegacyRestService" class="br.com.buzzpage.rest.service.PodcastLegacyRestService" />
+
+	<bean id="paginaRestService" class="br.com.buzzpage.rest.service.PaginaRestService" />
+	<bean id="cadastroPessoasRestService" class="br.com.buzzpage.rest.service.CadastroPessoasRestService" />
+	<bean id="conteudoRestService" class="br.com.buzzpage.rest.service.ConteudoRestService" />
+	<bean id="avaliacoesRestService" class="br.com.buzzpage.rest.service.AvaliacoesRestService" />
+	<bean id="comentarioRestService" class="br.com.buzzpage.rest.service.ComentarioRestService" />
+	<bean id="curtidaRestService" class="br.com.buzzpage.rest.service.CurtidaRestService" />
+	<bean id="regiaoRestService" class="br.com.buzzpage.rest.service.RegiaoRestService" />
+	<bean id="clickAnuncioRestService" class="br.com.buzzpage.rest.service.ClickAnuncioRestService" />
+	<bean id="anuncianteRestService" class="br.com.buzzpage.rest.service.AnuncianteRestService" />
+	 
+	<bean id="voucherRestService" class="br.com.buzzpage.rest.service.VoucherRestService" />
+	<bean id="conteudoService"
+		class="br.com.buzzpage.business.service.impl.ConteudoColaboradorServiceImpl" />
+	<bean id="pessoaService" class="br.com.buzzpage.business.service.impl.PessoaServiceImpl" />
+	<bean id="avaliacaoService"
+		class="br.com.buzzpage.business.service.impl.AvaliacaoServiceImpl" />
+	<bean id="mensagemService"
+		class="br.com.buzzpage.business.service.impl.MensagemServiceImpl" />
+	<bean id="paginaService" class="br.com.buzzpage.business.service.impl.PaginaServiceImpl" />
+	<bean id="pedidoService" class="br.com.buzzpage.business.service.impl.PedidoServiceImpl" />
+	<bean id="comentarioService"
+		class="br.com.buzzpage.business.service.impl.ComentarioServiceImpl" />
+	<bean id="curtidaService"
+		class="br.com.buzzpage.business.service.impl.CurtidaServiceImpl" />	
+	<bean id="regiaoService" class="br.com.buzzpage.business.service.impl.RegiaoServiceImpl" />
+	<bean id="voucherService" class="br.com.buzzpage.business.service.impl.VoucherServiceImpl" />
+	<bean id="anuncioService" class="br.com.buzzpage.business.service.impl.AnuncioServiceImpl" />
+	<bean id="extratoFinanceiroService" class="br.com.buzzpage.business.service.impl.ExtratoFinanceiroServiceImpl" />
+	<bean id="clickAnuncioService" class="br.com.buzzpage.business.service.impl.ClickAnuncioServiceImpl" />
+	<bean id="anuncianteService" class="br.com.buzzpage.business.service.impl.AnuncianteServiceImpl" />
+	<bean id="pedidoAnuncioService" class="br.com.buzzpage.business.service.impl.PedidoAnuncioServiceImpl" />
+	
+		
+	<bean id="podcastDao" class="br.com.buzzpage.dao.impl.PodcastDaoJPA2Impl" />
+	<bean id="paginaDao" class="br.com.buzzpage.dao.impl.PaginaDaoJPA2Impl" />
+	<bean id="pessoaDao" class="br.com.buzzpage.dao.impl.PessoaDaoJPA2Impl" />
+	<bean id="avaliacaoDao" class="br.com.buzzpage.dao.impl.AvaliacaoDaoJPA2Impl" />
+	<bean id="conteudoDao" class="br.com.buzzpage.dao.impl.ConteudoColaboradorDaoJPA2Impl" />
+	<bean id="mensagemDao" class="br.com.buzzpage.dao.impl.MensagemDaoJPA2Impl" />
+	<bean id="categoriaDao" class="br.com.buzzpage.dao.impl.CategoriaPaginaDaoJPA2Impl" />
+	<bean id="tipoPaginaDao" class="br.com.buzzpage.dao.impl.TipoPaginaDaoJPA2Impl" />
+	<bean id="pedidoDao" class="br.com.buzzpage.dao.impl.PedidoDaoJPA2Impl" />
+	<bean id="metricaTextoDao" class="br.com.buzzpage.dao.impl.MetricaTextoDaoJPA2Impl" />
+	<bean id="comentarioDao" class="br.com.buzzpage.dao.impl.ComentarioDaoJPA2Impl" />
+	<bean id="curtidaDao" class="br.com.buzzpage.dao.impl.CurtidaDaoJPA2Impl" />
+	<bean id="regiaoDao" class="br.com.buzzpage.dao.impl.RegiaoDaoJPA2Impl" />
+	<bean id="voucherDao" class="br.com.buzzpage.dao.impl.VoucherDaoJPA2Impl" />
+	<bean id="anuncioDao" class="br.com.buzzpage.dao.impl.AnuncioDaoJPA2Impl" />
+	<bean id="extratoFinanceiroDao" class="br.com.buzzpage.dao.impl.ExtratoFinanceiroDaoJPA2Impl" />
+	<bean id="tipoLancamentoDao" class="br.com.buzzpage.dao.impl.TipoLancamentoDaoJPA2Impl" />
+	<bean id="clickAnuncioDao" class="br.com.buzzpage.dao.impl.ClickAnuncioDaoJPA2Impl" />
+	<bean id="anuncianteDao" class="br.com.buzzpage.dao.impl.AnuncianteDaoJPA2Impl" />
+	<bean id="pedidoAnuncioDao" class="br.com.buzzpage.dao.impl.PedidoAnuncioDaoJPA2Impl" />
+	<bean id="paginaAnuncioDao" class="br.com.buzzpage.dao.impl.PaginaAnuncioDaoImpl" />
+	
+	<bean id="restBuzzPageDS" class="org.springframework.jndi.JndiObjectFactoryBean"
+		scope="singleton">
+		<property name="jndiName" value="${jndi.name}" />		
+		<property name="resourceRef" value="true" />
+	</bean>
+
+</beans>

@@ -1,0 +1,151 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+	 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		
+		http://www.springframework.org/schema/task 
+		http://www.springframework.org/schema/task/spring-task.xsd
+		 
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Autowired -->
+	<!-- used to activate annotations in beans already registered in the application 
+		context (no matter if they were defined with XML or by package scanning) -->
+	<context:annotation-config />
+	<!-- scans packages to find and register beans within the application context. -->
+	<context:component-scan base-package="${package}" />
+	<bean id="errors" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    	<property name="location" value="classpath:errors.properties"/>
+	</bean>
+	<bean id="analytics" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    	<property name="location" value="classpath:analytics.properties"/>
+	</bean>
+	<!-- ************ JPA configuration *********** -->
+
+	<!-- classpath*:*.properties -->
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<bean id="entityManagerFactoryBuzzPage"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:config/persistence-config.xml" />
+		<property name="persistenceUnitName" value="buzzpageRestPersistence" />
+		<property name="dataSource" ref="restBuzzPageDS" />
+		<property name="packagesToScan">
+			<array>
+				<value>${package}.entity</value>
+			</array>
+		</property>
+
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="net.sf.ehcache.configurationResourceName">/ehcache.xml</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
+			</props>
+		</property>
+
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryBuzzPage" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<task:annotation-driven />
+	<!--spring cache -->
+	<!-- Ehcache library setup -->
+	<bean id="ehcache" name="ehcache"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
+		p:shared="true" p:configLocation="classpath:ehcache.xml" />
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
+		p:cacheManager-ref="ehcache" />
+
+	<!-- @PersistenceUnit annotation -->
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	<bean id="persistenceExceptionTranslationPostProcessor"
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+	<bean id="podcastRestService" class="${package}.rest.service.PodcastRestService" />
+	<bean id="podcastLegacyRestService" class="${package}.rest.service.PodcastLegacyRestService" />
+
+	<bean id="paginaRestService" class="${package}.rest.service.PaginaRestService" />
+	<bean id="cadastroPessoasRestService" class="${package}.rest.service.CadastroPessoasRestService" />
+	<bean id="conteudoRestService" class="${package}.rest.service.ConteudoRestService" />
+	<bean id="avaliacoesRestService" class="${package}.rest.service.AvaliacoesRestService" />
+	<bean id="comentarioRestService" class="${package}.rest.service.ComentarioRestService" />
+	<bean id="curtidaRestService" class="${package}.rest.service.CurtidaRestService" />
+	<bean id="regiaoRestService" class="${package}.rest.service.RegiaoRestService" />
+	<bean id="clickAnuncioRestService" class="${package}.rest.service.ClickAnuncioRestService" />
+	<bean id="anuncianteRestService" class="${package}.rest.service.AnuncianteRestService" />
+	 
+	<bean id="voucherRestService" class="${package}.rest.service.VoucherRestService" />
+	<bean id="conteudoService"
+		class="${package}.business.service.impl.ConteudoColaboradorServiceImpl" />
+	<bean id="pessoaService" class="${package}.business.service.impl.PessoaServiceImpl" />
+	<bean id="avaliacaoService"
+		class="${package}.business.service.impl.AvaliacaoServiceImpl" />
+	<bean id="mensagemService"
+		class="${package}.business.service.impl.MensagemServiceImpl" />
+	<bean id="paginaService" class="${package}.business.service.impl.PaginaServiceImpl" />
+	<bean id="pedidoService" class="${package}.business.service.impl.PedidoServiceImpl" />
+	<bean id="comentarioService"
+		class="${package}.business.service.impl.ComentarioServiceImpl" />
+	<bean id="curtidaService"
+		class="${package}.business.service.impl.CurtidaServiceImpl" />	
+	<bean id="regiaoService" class="${package}.business.service.impl.RegiaoServiceImpl" />
+	<bean id="voucherService" class="${package}.business.service.impl.VoucherServiceImpl" />
+	<bean id="anuncioService" class="${package}.business.service.impl.AnuncioServiceImpl" />
+	<bean id="extratoFinanceiroService" class="${package}.business.service.impl.ExtratoFinanceiroServiceImpl" />
+	<bean id="clickAnuncioService" class="${package}.business.service.impl.ClickAnuncioServiceImpl" />
+	<bean id="anuncianteService" class="${package}.business.service.impl.AnuncianteServiceImpl" />
+	<bean id="pedidoAnuncioService" class="${package}.business.service.impl.PedidoAnuncioServiceImpl" />
+	
+		
+	<bean id="podcastDao" class="${package}.dao.impl.PodcastDaoJPA2Impl" />
+	<bean id="paginaDao" class="${package}.dao.impl.PaginaDaoJPA2Impl" />
+	<bean id="pessoaDao" class="${package}.dao.impl.PessoaDaoJPA2Impl" />
+	<bean id="avaliacaoDao" class="${package}.dao.impl.AvaliacaoDaoJPA2Impl" />
+	<bean id="conteudoDao" class="${package}.dao.impl.ConteudoColaboradorDaoJPA2Impl" />
+	<bean id="mensagemDao" class="${package}.dao.impl.MensagemDaoJPA2Impl" />
+	<bean id="categoriaDao" class="${package}.dao.impl.CategoriaPaginaDaoJPA2Impl" />
+	<bean id="tipoPaginaDao" class="${package}.dao.impl.TipoPaginaDaoJPA2Impl" />
+	<bean id="pedidoDao" class="${package}.dao.impl.PedidoDaoJPA2Impl" />
+	<bean id="metricaTextoDao" class="${package}.dao.impl.MetricaTextoDaoJPA2Impl" />
+	<bean id="comentarioDao" class="${package}.dao.impl.ComentarioDaoJPA2Impl" />
+	<bean id="curtidaDao" class="${package}.dao.impl.CurtidaDaoJPA2Impl" />
+	<bean id="regiaoDao" class="${package}.dao.impl.RegiaoDaoJPA2Impl" />
+	<bean id="voucherDao" class="${package}.dao.impl.VoucherDaoJPA2Impl" />
+	<bean id="anuncioDao" class="${package}.dao.impl.AnuncioDaoJPA2Impl" />
+	<bean id="extratoFinanceiroDao" class="${package}.dao.impl.ExtratoFinanceiroDaoJPA2Impl" />
+	<bean id="tipoLancamentoDao" class="${package}.dao.impl.TipoLancamentoDaoJPA2Impl" />
+	<bean id="clickAnuncioDao" class="${package}.dao.impl.ClickAnuncioDaoJPA2Impl" />
+	<bean id="anuncianteDao" class="${package}.dao.impl.AnuncianteDaoJPA2Impl" />
+	<bean id="pedidoAnuncioDao" class="${package}.dao.impl.PedidoAnuncioDaoJPA2Impl" />
+	<bean id="paginaAnuncioDao" class="${package}.dao.impl.PaginaAnuncioDaoImpl" />
+	
+	<bean id="restBuzzPageDS" class="org.springframework.jndi.JndiObjectFactoryBean"
+		scope="singleton">
+		<property name="jndiName" value="${symbol_dollar}{jndi.name}" />		
+		<property name="resourceRef" value="true" />
+	</bean>
+
+</beans>

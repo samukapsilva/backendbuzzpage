@@ -1,0 +1,11 @@
+br\com\buzzpage\dao\MetricaTextoDaoTest.class
+br\com\buzzpage\rest\RestIntegrationTest.class
+br\com\buzzpage\dao\PaginaDaoTest.class
+br\com\buzzpage\dao\ConteudoDaoTest.class
+br\com\buzzpage\dao\PedidoDaoTest.class
+br\com\buzzpage\dozer\PersonDtoTest.class
+br\com\buzzpage\rest\RegiaoRestIntegrationTest.class
+br\com\buzzpage\dao\ExtratoFinanceiroDaoTest.class
+br\com\buzzpage\exception\BuzzPageExceptionTest.class
+br\com\buzzpage\rest\RegiaoRestIntegrationTest$1.class
+br\com\buzzpage\jetty\JettyServer.class
