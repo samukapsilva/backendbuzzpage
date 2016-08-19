@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
+ 
+      <mapping map-id="person">
+        <class-a>br.com.buzzpage.dozer.PersonDomain</class-a>
+        <class-b>br.com.buzzpage.dozer.PersonDto</class-b>
+        <field>
+            <a>name</a>
+            <b>nameFull</b>
+        </field>
+        <field >
+            <a>age</a>
+            <b>ageThisYear</b>
+        </field>
+    </mapping>
+</mappings>

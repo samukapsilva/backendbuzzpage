@@ -1,0 +1,111 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	 xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+	 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		 
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	 <!-- Autowired -->
+    <!--  used to activate annotations in beans already registered in the application context (no matter if they were defined with XML or by package scanning) -->
+    <context:annotation-config/>
+    <!-- scans packages to find and register beans within the application context. -->
+    <context:component-scan base-package="br.com.buzzpage"/>
+	
+
+	<!-- ************ JPA configuration *********** -->
+	
+	
+ 
+
+	
+	<!--  classpath*:*.properties-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+	<bean id="entityManagerFactoryBuzzPage"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:config/persistence-config.xml" />
+		<property name="persistenceUnitName" value="buzzpageRestPersistence" />
+		<property name="dataSource" ref="restBuzzPageDS" />
+		<property name="packagesToScan">
+			<array>
+				<value>br.com.buzzpage.entity</value>
+			</array>
+		</property>
+		
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="net.sf.ehcache.configurationResourceName">/ehcache.xml</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+             </props>
+		</property>
+	  
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+				
+				
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryBuzzPage" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	    <!--spring cache-->
+<!--spring cache-->
+ <!-- Ehcache library setup -->
+<bean id="ehcache" name="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:shared="true"  p:configLocation="classpath:ehcache.xml"/>
+ 
+<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="ehcache"/>
+ 
+    <!-- @PersistenceUnit annotation -->
+    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+	
+	 
+ 
+   <bean id="persistenceExceptionTranslationPostProcessor" class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+	<bean id="podcastDao" class="br.com.buzzpage.dao.impl.PodcastDaoJPA2Impl" />
+	<bean id="podcastRestService" class="br.com.buzzpage.rest.service.PodcastRestService" />
+	<bean id="podcastLegacyRestService" class="br.com.buzzpage.rest.service.PodcastLegacyRestService" />
+		
+	<bean id="paginaRestService" 			class="br.com.buzzpage.rest.service.PaginaRestService" />
+	<bean id="cadastroPessoasRestService" 	class="br.com.buzzpage.rest.service.CadastroPessoasRestService" />
+	<bean id="conteudoRestService" 			class="br.com.buzzpage.rest.service.ConteudoRestService" />
+	<bean id="avaliacoesRestService" 		class="br.com.buzzpage.rest.service.AvaliacoesRestService" />
+	
+	<bean id="conteudoService" 	class="br.com.buzzpage.business.service.impl.ConteudoColaboradorServiceImpl" />
+	<bean id="pessoaService" 	class="br.com.buzzpage.business.service.impl.PessoaServiceImpl" />
+	<bean id="avaliacaoService" class="br.com.buzzpage.business.service.impl.AvaliacaoServiceImpl" />
+	<bean id="mensagemService" class="br.com.buzzpage.business.service.impl.MensagemServiceImpl" />
+	<bean id="paginaService" class="br.com.buzzpage.business.service.impl.PaginaServiceImpl" />
+	
+	
+	<bean id="paginaDao" 	class="br.com.buzzpage.dao.impl.PaginaDaoJPA2Impl" />
+	<bean id="pessoaDao" 	class="br.com.buzzpage.dao.impl.PessoaDaoJPA2Impl" />
+	<bean id="avaliacaoDao" class="br.com.buzzpage.dao.impl.AvaliacaoDaoJPA2Impl" />
+	<bean id="conteudoDao" 	class="br.com.buzzpage.dao.impl.ConteudoColaboradorDaoJPA2Impl" />
+	<bean id="mensagemDao" 	class="br.com.buzzpage.dao.impl.MensagemDaoJPA2Impl" />
+	<bean id="categoriaDao" 	class="br.com.buzzpage.dao.impl.CategoriaPaginaDaoJPA2Impl" />
+	<bean id="tipoPaginaDao" 	class="br.com.buzzpage.dao.impl.TipoPaginaDaoJPA2Impl" />
+	
+	 	 
+	<bean id="restBuzzPageDS" class="org.springframework.jndi.JndiObjectFactoryBean"
+		scope="singleton">
+		<property name="jndiName" value="java:/restBuzzPageDB" />
+		<property name="resourceRef" value="true" />
+	</bean>
+	
+</beans>

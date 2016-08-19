@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+	<Get name="securityHandler">
+		<Set name="loginService">
+			<New class="org.eclipse.jetty.security.JDBCLoginService">
+				<Set name="name">Test JDBC Realm</Set>
+				<Set name="config">src/main/resources/jdbcRealm.properties</Set>
+			</New>
+		</Set>
+		<Set name="checkWelcomeFiles">true</Set>
+	</Get>
+	<Call name="setAttribute">
+		<Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
+		<Arg>^$</Arg>
+	</Call>
+</Configure>
